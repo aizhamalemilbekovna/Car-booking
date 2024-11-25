@@ -58,6 +58,67 @@
     margin: 0 auto;
 }
 
+/* Секция истории бронирований */
+.history-section {
+    padding: 50px 0;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.history-section .sub-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #030305;
+}
+
+#booking-history-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#booking-history-table th, #booking-history-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+#booking-history-table th {
+    background-color: #4A90E2;
+    color: white;
+}
+
+#booking-history-table td {
+    background-color: #ffffff;
+}
+
+.button-edit, .button-delete {
+    padding: 5px 10px;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-edit {
+    background-color: #4CAF50;
+}
+
+.button-delete {
+    background-color: #E74C3C;
+}
+
+.button-edit:hover {
+    background-color: #45a049;
+}
+
+.button-delete:hover {
+    background-color: #c0392b;
+}
+
+
 /* Описание отчета */
 .report-description {
     font-size: 16px;
