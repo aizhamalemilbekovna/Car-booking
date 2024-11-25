@@ -282,3 +282,135 @@ function downloadReport() {
 function printReport() {
     window.print();
 }
+
+// Глобальная переменная для хранения имени текущего пользователя после входа
+let currentUser = "";
+
+// Функция обновления таблицы истории бронирований только для текущего пользователя
+function updateBookingHistoryTable() {
+    const bookingHistoryList = document.getElementById("booking-history-list");
+    bookingHistoryList.innerHTML = "";
+
+    bookings.forEach((booking, index) => {
+        if (booking.name === currentUser) { // Проверка на текущего пользователя
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${booking.name}</td>
+                <td>${booking.phone}</td>
+                <td>${booking.car}</td>
+                <td>${booking.startDate}</td>
+                <td>${booking.endDate}</td>
+                <td>
+                    <button class="button-edit" onclick="editBooking(${index})">Редактировать</button>
+                    <button class="button-delete" onclick="deleteBooking(${index})">Отменить</button>
+                </td>
+            `;
+            bookingHistoryList.appendChild(row);
+        }
+    });
+}
+
+// Функция добавления нового бронирования с привязкой к имени текущего пользователя
+function addBooking() {
+    const name = currentUser; // Используем имя вошедшего пользователя
+    const phone = document.getElementById("phone").value;
+    const car = document.getElementById("car").value;
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+
+    if (phone && car && startDate && endDate && new Date(startDate) <= new Date(endDate)) {
+        bookings.push({ name, phone, car, startDate, endDate });
+        saveBookingsToLocalStorage();
+        updateBookedCarsTable();
+        updateBookingHistoryTable();
+        updateReportTable();
+
+        // Очистка формы
+        document.getElementById("phone").value = "";
+        document.getElementById("car").value = "";
+        document.getElementById("start-date").value = "";
+        document.getElementById("end-date").value = "";
+
+        alert("Бронирование успешно добавлено!");
+    } else {
+        alert("Пожалуйста, заполните все поля корректно.");
+    }
+}
+
+// Функция для входа пользователя
+document.getElementById("login-button").onclick = function () {
+    const username = document.getElementById("login-username").value;
+    const password = document.getElementById("login-password").value;
+
+    const storedUsername = localStorage.getItem("username");
+    const storedPassword = localStorage.getItem("password");
+
+    if (username === storedUsername && password === storedPassword) {
+        currentUser = username; // Устанавливаем имя текущего пользователя
+        alert("Вход выполнен успешно!");
+        
+        // Скрыть секцию авторизации и показать панель управления
+        document.querySelector(".auth-container").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("welcome-username").textContent = username;
+
+        updateBookedCarsTable(); // Обновить таблицу забронированных автомобилей
+        updateBookingHistoryTable(); // Обновить таблицу истории бронирований для текущего пользователя
+        updateReportTable(); // Обновить таблицу отчета
+    } else {
+        alert("Неверное имя пользователя или пароль.");
+    }
+};
+
+// Функция редактирования бронирования
+function editBooking(index) {
+    const booking = bookings[index];
+    if (booking.name !== currentUser) return; // Только текущий пользователь может редактировать свои брони
+
+    document.getElementById("phone").value = booking.phone;
+    document.getElementById("car").value = booking.car;
+    document.getElementById("start-date").value = booking.startDate;
+    document.getElementById("end-date").value = booking.endDate;
+
+    const confirmButton = document.getElementById("price-action");
+    confirmButton.textContent = "Сохранить изменения";
+    confirmButton.onclick = function () {
+        const phone = document.getElementById("phone").value;
+        const car = document.getElementById("car").value;
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+
+        if (phone && car && startDate && endDate && new Date(startDate) <= new Date(endDate)) {
+            bookings[index] = { name: currentUser, phone, car, startDate, endDate };
+            saveBookingsToLocalStorage();
+            updateBookedCarsTable();
+            updateBookingHistoryTable();
+            updateReportTable();
+
+            document.getElementById("phone").value = "";
+            document.getElementById("car").value = "";
+            document.getElementById("start-date").value = "";
+            document.getElementById("end-date").value = "";
+            confirmButton.textContent = "Добавить";
+            confirmButton.onclick = addBooking;
+
+            alert("Бронирование успешно обновлено!");
+        } else {
+            alert("Пожалуйста, заполните все поля корректно.");
+        }
+    };
+}
+
+// Функция для отмены бронирования
+function deleteBooking(index) {
+    const booking = bookings[index];
+    if (booking.name !== currentUser) return; // Только текущий пользователь может отменять свои брони
+
+    bookings.splice(index, 1);
+    saveBookingsToLocalStorage();
+    updateBookedCarsTable();
+    updateBookingHistoryTable();
+    updateReportTable();
+    alert("Бронирование успешно отменено!");
+}
+
